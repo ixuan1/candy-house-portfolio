@@ -118,4 +118,7 @@ python -m http.server 5500 -d static       # 然后访问 http://localhost:5500/
 
 ## 许可证
 
+
+test
+
 [MIT](LICENSE) © 2026 Candy House
