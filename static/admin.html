@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果屋 · 作品管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">跳到主内容</a>
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="/"><span class="mark">🍬</span>糖果屋</a>
+    <nav class="nav__links" aria-label="主导航">
+      <a href="/">展示页</a>
+      <a href="/admin.html">管理</a>
+      <a href="/debug.html">调试</a>
+    </nav>
+    <a class="btn btn--ghost btn--sm" href="/">← 返回</a>
+  </div>
+</header>
+
+<main id="main" class="admin-wrap">
+  <span class="section-tag">作品管理 / CRUD</span>
+  <h1 class="section__title" style="margin-bottom:24px">增删改查控制台</h1>
+
+  <!-- 表单：新增 / 编辑共用 -->
+  <form class="form-card" id="work-form">
+    <input type="hidden" id="edit-id" value="" />
+    <div class="form-grid">
+      <div class="field"><label for="title">名称 *</label><input id="title" required placeholder="例如：霓虹甜品站" /></div>
+      <div class="field"><label for="category">分类</label>
+        <select id="category">
+          <option>Web</option><option>UI</option><option>Canvas</option><option>API</option><option>Type</option><option>其他</option>
+        </select></div>
+      <div class="field"><label for="color">糖果色</label>
+        <select id="color">
+          <option value="#FF1493">热粉 #FF1493</option>
+          <option value="#FFE135">电光黄 #FFE135</option>
+          <option value="#00BFFF">天蓝 #00BFFF</option>
+          <option value="#A6FF00">青柠绿 #A6FF00</option>
+          <option value="#FF7A00">橙 #FF7A00</option>
+          <option value="#B026FF">紫 #B026FF</option>
+        </select></div>
+      <div class="field"><label for="link">外链</label><input id="link" placeholder="https://..." /></div>
+      <div class="field full"><label for="description">描述</label><textarea id="description" placeholder="一句话介绍这个作品…"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn--pink" type="submit" id="submit-btn">+ 添加作品</button>
+      <button class="btn btn--ghost" type="button" id="cancel-btn" style="display:none" onclick="resetForm()">取消编辑</button>
+    </div>
+  </form>
+
+  <!-- 列表 -->
+  <div class="list-card">
+    <table>
+      <thead><tr><th>色</th><th>名称</th><th>分类</th><th>外链</th><th>操作</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" style="text-align:center;padding:30px">加载中…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = "/api/works";
+const $ = id => document.getElementById(id);
+
+function toast(msg){
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function resetForm(){
+  $("work-form").reset();
+  $("edit-id").value = "";
+  $("submit-btn").textContent = "+ 添加作品";
+  $("cancel-btn").style.display = "none";
+}
+
+$("work-form").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const id = $("edit-id").value;
+  const payload = {
+    title: $("title").value.trim(),
+    category: $("category").value,
+    color: $("color").value,
+    link: $("link").value.trim(),
+    description: $("description").value.trim(),
+  };
+  if(!payload.title){ toast("名称不能为空"); return; }
+  try{
+    const r = id
+      ? await fetch(`${API}/${id}`, {method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)})
+      : await fetch(API, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    toast(id ? "已更新 ✅" : "已添加 ✅");
+    resetForm();
+    loadList();
+  }catch(err){ toast("操作失败："+err.message); }
+});
+
+async function loadList(){
+  const tb = $("rows");
+  try{
+    const r = await fetch(API);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const list = await r.json();
+    if(!list.length){ tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px">还没有作品，上面表单添加第一颗糖 🍬</td></tr>'; return; }
+    tb.innerHTML = list.map(w=>`
+      <tr>
+        <td><span class="swatch" style="background:${esc(w.color)}"></span></td>
+        <td><strong>${esc(w.title)}</strong></td>
+        <td><span class="tag">${esc(w.category)}</span></td>
+        <td>${w.link?`<a href="${esc(w.link)}" target="_blank" rel="noopener">打开 ↗</a>`:"—"}</td>
+        <td><div class="row-actions">
+          <button class="btn btn--sky btn--sm" onclick="editWork(${w.id})">编辑</button>
+          <button class="btn btn--pink btn--sm" onclick="delWork(${w.id})">删除</button>
+        </div></td>
+      </tr>`).join("");
+  }catch(err){ tb.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--pink)">取数失败：${esc(err.message)}</td></tr>`; }
+}
+
+async function editWork(id){
+  const r = await fetch(`${API}/${id}`);
+  if(!r.ok) return toast("读取失败");
+  const w = await r.json();
+  $("edit-id").value = w.id;
+  $("title").value = w.title;
+  $("category").value = w.category;
+  $("color").value = w.color;
+  $("link").value = w.link || "";
+  $("description").value = w.description || "";
+  $("submit-btn").textContent = "保存修改";
+  $("cancel-btn").style.display = "inline-flex";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+async function delWork(id){
+  if(!confirm("确定删除这件作品？此操作不可恢复。")) return;
+  const r = await fetch(`${API}/${id}`, {method:"DELETE"});
+  if(!r.ok) return toast("删除失败");
+  toast("已删除 🗑️");
+  loadList();
+}
+
+loadList();
+</script>
+</body>
+</html>

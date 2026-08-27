@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果屋 · CANDY HOUSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">跳到主内容</a>
+
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="/"><span class="mark">🍬</span>糖果屋</a>
+    <nav class="nav__links" aria-label="主导航">
+      <a href="/#hero">首页</a>
+      <a href="/#work">作品</a>
+      <a href="/#timeline">经历</a>
+      <a href="/admin.html">管理</a>
+      <a href="/debug.html">调试</a>
+    </nav>
+    <a class="btn btn--pink btn--sm" href="/admin.html">+ 添加作品</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="hero">
+    <div class="wrap hero__grid">
+      <div>
+        <span class="section-tag">个人作品集 / PORTFOLIO</span>
+        <h1 class="hero__title">用代码调色的<br/><span class="candy">甜点</span><span class="candy2">工坊</span></h1>
+        <p class="hero__sub">我是「糖果屋」主理人 —— 前端开发者 &amp; 视觉设计师。下面这些作品都活在 MySQL 里，由 API 实时取出。</p>
+        <div class="hero__chips">
+          <span class="tag">FastAPI</span><span class="tag">MySQL</span><span class="tag">Docker</span><span class="tag">Nginx</span>
+        </div>
+        <div class="hero__actions">
+          <a class="btn btn--pink" href="/admin.html">去管理作品 →</a>
+          <a class="btn btn--ghost" href="/debug.html">调试面板</a>
+        </div>
+      </div>
+      <div class="card" style="background:var(--sky-bg);padding:26px">
+        <h3>🍬 数据来自哪里？</h3>
+        <p class="mono" style="font-size:.82rem;margin-top:8px">前端 → Nginx 反代 → /api/works → FastAPI → MySQL</p>
+        <p style="margin-top:12px;font-size:.95rem">作品数据全部存在京东云服务器的 MySQL 里，前端不再写死。改一条，全站即时变。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="work">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="section-tag">作品橱窗 / WORKS</span>
+        <h2 class="section__title">糖果展示柜</h2>
+        <p class="section__desc">这些卡片由 <code>/api/works</code> 实时渲染（来自 MySQL）。</p>
+      </div>
+      <div class="bento" id="bento">
+        <div class="empty-state">加载中…</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="timeline">
+    <div class="wrap">
+      <div class="section__head"><span class="section-tag">成长轨迹 / JOURNEY</span><h2 class="section__title">从糖粉到主厨</h2></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-card"><span class="tl-date mono">2025 — 至今</span><h3>自由前端开发者</h3><p>独立承接品牌官网与互动营销页。</p></div></div>
+        <div class="tl-item"><div class="tl-card"><span class="tl-date mono">2023 — 2025</span><h3>甜星科技 · 高级前端</h3><p>主导设计系统建设，组件复用率 80%+。</p></div></div>
+        <div class="tl-item"><div class="tl-card"><span class="tl-date mono">2021 — 2023</span><h3>糖霜工作室 · UI 工程师</h3><p>负责电商与活动页视觉还原。</p></div></div>
+        <div class="tl-item"><div class="tl-card"><span class="tl-date mono">2019 — 2021</span><h3>设计实习 &amp; 自学</h3><p>从平面设计入行，疯狂补前端。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap about">
+      <div class="about-card"><h2>关于这间屋子</h2><p>我相信好界面该像水果糖——入口惊艳、回味干净。擅长用最朴素的代码，做出有重量感、人人能用的产品。</p>
+        <ul><li>HTML5</li><li>CSS3</li><li>Python</li><li>FastAPI</li><li>MySQL</li><li>Docker</li></ul></div>
+      <div class="card" style="background:var(--purple-bg);aspect-ratio:1/1;display:grid;place-items:center"><h3 style="font-size:1.6rem">🍭</h3></div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>一起做点甜的东西？</h2>
+      <p style="margin:14px auto 26px;max-width:52ch">有品牌官网、互动页面想落地？把需求告诉我。</p>
+      <a class="btn btn--pink" href="mailto:hi@candyhouse.dev">写封邮件给我 →</a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div><span class="logo"><span class="mark">🍬</span>糖果屋</span><p style="margin-top:12px;color:#cfcfcf;max-width:38ch">用代码调色的甜点工坊。全栈 + Docker + Nginx 实战作品。</p></div>
+      <div><h4>导览</h4><ul><li><a href="/">首页</a></li><li><a href="/admin.html">管理</a></li><li><a href="/debug.html">调试</a></li></ul></div>
+      <div><h4>联系</h4><ul><li><a href="mailto:hi@candyhouse.dev">hi@candyhouse.dev</a></li><li><a href="/docs">API 文档</a></li></ul></div>
+    </div>
+    <div class="footer__bottom"><span>© 2026 糖果屋 CANDY HOUSE</span><span>FASTAPI + MYSQL + DOCKER + NGINX</span></div>
+  </div>
+</footer>
+
+<script>
+const CLS = ["proj--pink","proj--sky","proj--yellow","proj--lime","proj--purple","proj--orange"];
+async function loadWorks(){
+  const box = document.getElementById("bento");
+  try{
+    const r = await fetch("/api/works");
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const works = await r.json();
+    if(!works.length){
+      box.innerHTML = '<div class="empty-state">还没有作品 🍬 去 <a class="btn btn--pink btn--sm" href="/admin.html">管理页</a> 添加第一颗糖吧。</div>';
+      return;
+    }
+    box.innerHTML = works.map((w,i)=>{
+      const big = i===0 ? " proj--big" : "";
+      const bg = ["var(--pink-bg)","var(--sky-bg)","var(--yellow-bg)","var(--lime-bg)","var(--purple-bg)","var(--orange-bg)"][i%6];
+      return `<article class="card proj${big}" style="background:${bg}">
+        <div><span class="proj__no mono">${String(i+1).padStart(2,'0')}</span>
+        <h3>${escapeHtml(w.title)}</h3>
+        <p>${escapeHtml(w.description||"")}</p></div>
+        <div class="proj__foot"><span class="tag">${escapeHtml(w.category)}</span>
+        ${w.link?`<a class="btn btn--ghost btn--sm" href="${escapeHtml(w.link)}" target="_blank" rel="noopener">查看 ↗</a>`:""}</div>
+      </article>`;
+    }).join("");
+  }catch(e){
+    box.innerHTML = '<div class="empty-state">⚠️ 取数失败：'+escapeHtml(e.message)+'（先确认后端/Nginx 已起来，或去调试页排查）</div>';
+  }
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+loadWorks();
+</script>
+</body>
+</html>

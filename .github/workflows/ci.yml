@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile-check backend code
+        run: python -m py_compile api/*.py
+
+      - name: Assert no secrets committed
+        run: |
+          if git ls-files --error-unmatch api/.env >/dev/null 2>&1; then
+            echo "::error::api/.env is tracked — it contains production passwords. Remove it from git and rely on .gitignore + .env.example."
+            exit 1
+          fi
+          echo "OK: no .env tracked"

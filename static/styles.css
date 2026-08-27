@@ -1,0 +1,146 @@
+/* ============ 糖果屋 · 共享设计系统（Neo-Brutalism） ============ */
+:root{
+  --ink:#0A0A0A; --paper:#F5F5F0;
+  --pink:#FF1493; --yellow:#FFE135; --sky:#00BFFF; --lime:#A6FF00; --orange:#FF7A00; --purple:#B026FF;
+  --pink-bg:#FFE3F1; --yellow-bg:#FFF6C2; --sky-bg:#D9F2FF; --lime-bg:#ECFFC7; --orange-bg:#FFE6CC; --purple-bg:#F1E2FF;
+  --b:3px; --sh:6px 6px 0 #000; --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:"Inter",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.display{font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;line-height:1.05;letter-spacing:-.02em;}
+.mono{font-family:"JetBrains Mono",monospace;font-weight:700;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px;}
+
+/* 字体（Google Fonts 在页面 <head> 引入） */
+.skip{position:absolute;left:-999px;top:0;z-index:200;background:var(--yellow);border:var(--b) solid #000;box-shadow:var(--sh);padding:12px 18px;font-family:"JetBrains Mono",monospace;font-weight:700;}
+.skip:focus{left:16px;top:16px;}
+:focus-visible{outline:4px solid var(--purple);outline-offset:3px;}
+
+.tag{display:inline-block;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.72rem;padding:4px 10px;border:var(--b) solid #000;background:#fff;}
+.section-tag{display:inline-block;margin-bottom:14px;font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.8rem;padding:6px 12px;border:var(--b) solid #000;background:var(--ink);color:#fff;transform:rotate(-1.5deg);}
+
+.card{position:relative;background:#fff;border:var(--b) solid #000;box-shadow:var(--sh);border-radius:var(--r);overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;}
+.card:hover,.card:focus-within{transform:translate(-3px,-3px);box-shadow:11px 11px 0 #000;}
+
+.btn{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:1rem;padding:14px 26px;border:var(--b) solid #000;border-radius:var(--r);background:var(--yellow);box-shadow:5px 5px 0 #000;color:var(--ink);transition:transform .1s ease,box-shadow .1s ease;}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #000;}
+.btn:active{transform:translate(5px,5px);box-shadow:0 0 0 #000;}
+.btn--pink{background:var(--pink);color:#fff;}
+.btn--sky{background:var(--sky);color:#fff;}
+.btn--ghost{background:#fff;}
+.btn--sm{padding:8px 14px;font-size:.85rem;box-shadow:3px 3px 0 #000;}
+
+/* 导航 */
+.nav{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:var(--b) solid #000;}
+.nav__inner{display:flex;align-items:center;justify-content:space-between;height:68px;gap:16px;}
+.logo{display:flex;align-items:center;gap:10px;font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:1.25rem;}
+.logo .mark{width:38px;height:38px;border:var(--b) solid #000;border-radius:10px;background:var(--pink);box-shadow:3px 3px 0 #000;display:grid;place-items:center;}
+.nav__links{display:flex;gap:8px;flex-wrap:wrap;}
+.nav__links a{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.82rem;padding:8px 12px;border:var(--b) solid transparent;border-radius:10px;transition:all .15s ease;}
+.nav__links a:hover{border-color:#000;background:#fff;box-shadow:3px 3px 0 #000;transform:translate(-1px,-1px);}
+.nav__links a.active{background:var(--yellow);border-color:#000;box-shadow:3px 3px 0 #000;}
+
+/* 通用 section */
+.section{padding:72px 0;position:relative;}
+.section__head{margin-bottom:38px;}
+.section__title{font-size:clamp(2rem,4.5vw,3rem);}
+.section__desc{margin-top:10px;max-width:60ch;font-size:1.05rem;}
+
+/* Hero */
+.hero{padding:74px 0 86px;}
+.hero__grid{display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center;}
+.hero__title{font-size:clamp(2.8rem,7vw,5.4rem);}
+.hero__title .candy{background:var(--pink);color:#fff;padding:0 .12em;border:var(--b) solid #000;box-shadow:6px 6px 0 #000;display:inline-block;transform:rotate(-2deg);}
+.hero__title .candy2{background:var(--yellow);color:var(--ink);padding:0 .12em;border:var(--b) solid #000;box-shadow:6px 6px 0 #000;display:inline-block;transform:rotate(1.5deg);}
+.hero__sub{margin:22px 0;font-size:1.12rem;max-width:46ch;}
+.hero__chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+.hero__actions{display:flex;gap:14px;flex-wrap:wrap;}
+
+/* Bento 作品网格（API 驱动） */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;grid-auto-rows:minmax(170px,auto);}
+.proj{padding:22px;display:flex;flex-direction:column;justify-content:space-between;}
+.proj--big{grid-column:span 2;}
+.proj p{font-size:.95rem;}
+.proj__no{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.78rem;}
+.proj h3{font-size:1.4rem;margin:8px 0 6px;}
+.proj__foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:8px;}
+.empty-state{border:var(--b) dashed #000;background:#fff;border-radius:var(--r);padding:40px;text-align:center;grid-column:1/-1;}
+
+/* 时间线 / 关于（保留静态展示） */
+.timeline{position:relative;margin-left:8px;padding-left:34px;}
+.timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:var(--b);background:var(--ink);}
+.tl-item{position:relative;padding:0 0 30px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-item::before{content:"";position:absolute;left:-34px;top:4px;width:20px;height:20px;background:var(--pink);border:var(--b) solid #000;border-radius:50%;box-shadow:3px 3px 0 #000;}
+.tl-item:nth-child(2)::before{background:var(--yellow);}
+.tl-item:nth-child(3)::before{background:var(--sky);}
+.tl-item:nth-child(4)::before{background:var(--lime);}
+.tl-card{background:#fff;border:var(--b) solid #000;box-shadow:6px 6px 0 #000;border-radius:var(--r);padding:18px 20px;}
+.tl-date{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.78rem;color:var(--purple);}
+.tl-card h3{font-size:1.2rem;margin:4px 0;}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;}
+.about-card{background:var(--lime-bg);padding:30px;border:var(--b) solid #000;box-shadow:8px 8px 0 #000;border-radius:var(--r);}
+.about-card h2{font-size:2rem;margin-bottom:12px;}
+.about-card ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.about-card li{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.74rem;padding:6px 10px;border:var(--b) solid #000;background:#fff;}
+
+/* CTA / Footer */
+.cta{background:var(--yellow);border-top:var(--b) solid #000;border-bottom:var(--b) solid #000;padding:70px 20px;text-align:center;}
+.cta h2{font-size:clamp(2rem,5vw,3.4rem);}
+.footer{background:var(--ink);color:#fff;padding:56px 0 28px;}
+.footer a{color:#fff;}
+.footer__grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:36px;}
+.footer h4{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--yellow);margin-bottom:14px;}
+.footer ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.footer li a{border-bottom:2px solid transparent;padding-bottom:2px;}
+.footer li a:hover{border-color:var(--pink);}
+.footer__bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:2px solid #333;padding-top:20px;font-family:"JetBrains Mono",monospace;font-size:.74rem;color:#9a9a9a;}
+
+/* ============ 管理页 / 调试页 专属 ============ */
+.admin-wrap{max-width:960px;margin:0 auto;padding:90px 20px 60px;}
+.form-card{background:var(--yellow-bg);padding:24px;border:var(--b) solid #000;box-shadow:var(--sh);border-radius:var(--r);margin-bottom:30px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field.full{grid-column:1/-1;}
+.field label{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:.78rem;}
+.field input,.field textarea,.field select{font-family:"Inter",sans-serif;font-size:1rem;padding:10px 12px;border:var(--b) solid #000;border-radius:10px;background:#fff;color:var(--ink);}
+.field textarea{resize:vertical;min-height:80px;}
+.form-actions{display:flex;gap:12px;margin-top:18px;}
+.list-card{border:var(--b) solid #000;box-shadow:var(--sh);border-radius:var(--r);background:#fff;overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+th,td{text-align:left;padding:12px 14px;border-bottom:var(--b) solid #000;font-size:.92rem;vertical-align:middle;}
+th{font-family:"JetBrains Mono",monospace;font-size:.74rem;background:var(--paper);}
+tr:last-child td{border-bottom:none;}
+.swatch{display:inline-block;width:18px;height:18px;border:2px solid #000;border-radius:4px;vertical-align:middle;margin-right:6px;}
+.row-actions{display:flex;gap:8px;}
+
+/* 调试页 */
+.debug-wrap{max-width:860px;margin:0 auto;padding:90px 20px 60px;}
+.panel{background:#fff;border:var(--b) solid #000;box-shadow:var(--sh);border-radius:var(--r);padding:22px;margin-bottom:22px;}
+.kv{font-family:"JetBrains Mono",monospace;font-size:.86rem;line-height:1.9;}
+.status-ok{color:var(--purple);font-weight:700;}
+.status-bad{color:var(--pink);font-weight:700;}
+pre{background:var(--ink);color:#E6E6E6;padding:14px;border-radius:10px;overflow:auto;font-family:"JetBrains Mono",monospace;font-size:.8rem;}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border:var(--b) solid #000;box-shadow:var(--sh);border-radius:10px;font-family:"JetBrains Mono",monospace;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;}
+.toast.show{opacity:1;}
+
+@media (max-width:900px){
+  .hero__grid{grid-template-columns:1fr;}
+  .bento{grid-template-columns:repeat(2,1fr);}
+  .proj--big{grid-column:span 2;}
+  .about{grid-template-columns:1fr;}
+  .footer__grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:560px){
+  .nav__links{display:none;}
+  .bento{grid-template-columns:1fr;}
+  .proj--big{grid-column:span 1;}
+  .form-grid{grid-template-columns:1fr;}
+  .footer__grid{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important;}
+  .btn:hover,.card:hover{transform:none!important;}
+}

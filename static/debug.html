@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>糖果屋 · 调试面板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">跳到主内容</a>
+<header class="nav">
+  <div class="wrap nav__inner">
+    <a class="logo" href="/"><span class="mark">🍬</span>糖果屋</a>
+    <nav class="nav__links"><a href="/">展示页</a><a href="/admin.html">管理</a><a href="/debug.html">调试</a></nav>
+    <a class="btn btn--ghost btn--sm" href="/">← 返回</a>
+  </div>
+</header>
+
+<main id="main" class="debug-wrap">
+  <span class="section-tag">调试面板 / DEBUG</span>
+  <h1 class="section__title" style="margin-bottom:8px">方便你排错的控制台</h1>
+  <p class="section__desc">后端是 FastAPI，自带 Swagger 文档；下面一键测连通性。</p>
+
+  <div class="panel">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn--sky btn--sm" onclick="pingHealth()">① 测健康检查 /api/health</button>
+      <button class="btn btn--pink btn--sm" onclick="pingList()">② 列作品 /api/works</button>
+    </div>
+    <div class="kv" id="health-out" style="margin-top:16px">点上面按钮开始…</div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:10px">③ 交互式 API 文档（最香的调试工具）</h3>
+    <p>FastAPI 自动生成，可直接在网页里发请求：</p>
+    <div class="row-actions" style="margin-top:12px">
+      <a class="btn btn--ghost btn--sm" href="/docs" target="_blank" rel="noopener">Swagger UI →</a>
+      <a class="btn btn--ghost btn--sm" href="/redoc" target="_blank" rel="noopener">ReDoc →</a>
+      <a class="btn btn--ghost btn--sm" href="/openapi.json" target="_blank" rel="noopener">OpenAPI JSON →</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:10px">④ 常用 curl 命令（服务器上排错用）</h3>
+    <pre># 健康检查
+curl -s http://localhost/api/health
+
+# 列出全部作品
+curl -s http://localhost/api/works
+
+# 新增一件作品（POST）
+curl -s -X POST http://localhost/api/works \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"测试糖果","category":"Web","color":"#FF1493","description":"调试用","link":""}'
+
+# 改（PUT，id 换成真实 id）
+curl -s -X PUT http://localhost/api/works/1 \
+  -H 'Content-Type: application/json' -d '{"title":"改名后的糖果"}'
+
+# 删（DELETE）
+curl -s -X DELETE http://localhost/api/works/1</pre>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-bottom:10px">⑤ 容器/服务状态（在服务器上跑）</h3>
+    <pre># 看所有容器状态（STATUS 应全是 Up，app 应有 2 个）
+docker compose ps
+
+# 看日志（加 --follow 实时滚动）
+docker compose logs -f app
+docker compose logs -f nginx
+
+# 探活某容器
+docker compose exec app curl -s http://localhost:8000/api/health</pre>
+  </div>
+</main>
+
+<script>
+async function pingHealth(){
+  const out = document.getElementById("health-out");
+  out.innerHTML = "请求中…";
+  try{
+    const r = await fetch("/api/health");
+    const j = await r.json();
+    const ok = j.status === "ok" && j.db;
+    out.innerHTML = `结果：<span class="${ok?'status-ok':'status-bad'}">${ok?'✅ 正常':'⚠️ 异常'}</span><br>` + JSON.stringify(j,null,2);
+  }catch(e){ out.innerHTML = `<span class="status-bad">❌ 请求失败：${e.message}</span>`; }
+}
+async function pingList(){
+  const out = document.getElementById("health-out");
+  out.innerHTML = "请求中…";
+  try{
+    const r = await fetch("/api/works");
+    const j = await r.json();
+    out.innerHTML = `状态 ${r.status} · 共 ${j.length} 件作品<br>` + JSON.stringify(j.slice(0,3),null,2) + (j.length>3?`\n…(仅显示前3)`:"");
+  }catch(e){ out.innerHTML = `<span class="status-bad">❌ 请求失败：${e.message}</span>`; }
+}
+</script>
+</body>
+</html>

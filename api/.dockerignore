@@ -1,0 +1,7 @@
+# 构建镜像时排除本地环境文件，保持镜像干净、不泄露密码
+.env
+__pycache__/
+*.pyc
+.venv/
+.git/
+.pytest_cache/

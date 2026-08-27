@@ -1,0 +1,67 @@
+# ============================================================
+#  糖果屋 · Docker 编排（只含 db + app）
+#
+#  ⚠️ 本文件位于 docker/ 子目录，相对路径以 docker/ 为基准，用 ../ 回到项目根。
+#
+#  📌 本方案“不用 Docker 跑 Nginx”：
+#     - MySQL(db) 与 FastAPI(app) 跑在 Docker；
+#     - Nginx 在【宿主机】原生运行（systemd 托管），更接近传统运维。
+#     - app 把 8000 映射到宿主机回环地址 127.0.0.1，由宿主机 Nginx 反代/负载均衡。
+#
+#  常用命令（务必在项目根目录 /opt/candy-house-portfolio 执行）：
+#    启动：  docker compose -f docker/docker-compose.yml up -d --scale app=2
+#    看状态：docker compose -f docker/docker-compose.yml ps
+#    看日志：docker compose -f docker/docker-compose.yml logs -f app
+#    停止：  docker compose down
+#    清数据：docker compose down -v   （慎用，会清空 MySQL）
+# ============================================================
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: candy_db
+    # 与 app 共用同一份 api/.env：MYSQL_ROOT_PASSWORD / MYSQL_USER /
+    # MYSQL_PASSWORD / MYSQL_DATABASE 都从这份文件读取，确保两端密码一致。
+    env_file: ../api/.env
+    volumes:
+      - db_data:/var/lib/mysql                                   # 数据持久化
+      - ../db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro    # 首次启动自动建表
+    networks: [candy-net]
+    healthcheck:
+      # 用容器运行时的 $MYSQL_ROOT_PASSWORD（来自 env_file）探活；
+      # 写成 $$ 避免被 Compose 在解析阶段提前插值。
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build: ../api
+    # 注意：用了 --scale 扩容就不要写固定 container_name（会命名冲突），
+    # 让 Compose 自动命名为 candy-house-portfolio-app-1 / -2。
+    env_file: ../api/.env          # 提供 DATABASE_URL / MYSQL_HOST 等
+    networks: [candy-net]          # ⚠️ 必须与 db 在同一自定义网络，才能用服务名 "db" 互访
+    depends_on:
+      db:
+        condition: service_healthy      # 等 MySQL 真正能连再起 app
+    # 映射到宿主机【回环地址】，只本机 Nginx 能访问，外网打不到 8000。
+    # 扩到 2 个 app 时各自占 8000 / 8001，宿主机 Nginx 的 upstream 要对应加上。
+    ports:
+      - "127.0.0.1:8000-8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health').status==200 else 1)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    # 想多开几份做负载均衡：docker compose up -d --scale app=2
+    # （宿主机 Nginx 的 upstream 已配 least_conn，会自动分摊）
+
+volumes:
+  db_data:
+
+networks:
+  candy-net:
+    driver: bridge
