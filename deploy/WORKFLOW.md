@@ -1,6 +1,6 @@
 # 糖果屋 · 完整开发 → 上线流程
 
-> 这份文档管的是**代码怎么从你的手指头流到线上**，以及每一环该怎么验证、怎么回滚。
+> 这份文档管的是**代码怎么从你的手指头流到线上**，以及每一环该怎么验证、怎么回滚。  
 > 具体某条命令不懂，查 `STEP-BY-STEP.md`（那里每条命令都有参数注释）。
 
 ---
@@ -9,24 +9,25 @@
 
 因为这几个决策会影响整条流水线，我先按推荐值定了，你觉得不合适告诉我，改动不大：
 
-| 决策点 | 当前取值 | 为什么这么选 |
-|---|---|---|
-| 写代码的地方 | **Windows 开发机**（F 盘） | 你有 IDE；VM 只做测试，职责最干净 |
-| 分支策略 | `main` / `develop` / `feature/*` | 测试和生产天然隔离，是最标准的做法 |
-| 项目路径 | 三处统一 `/opt/candy-house-portfolio` | **消除路径差异**，nginx 配置两份环境通用 |
-| 生产环境（京东云） | **本阶段先不动** | 等测试环境跑顺了再做，见第 9 节 |
+| 决策点       | 当前取值                              | 为什么这么选                    |
+| --------- | --------------------------------- | ------------------------- |
+| 写代码的地方    | **Windows 开发机**（F 盘）              | 你有 IDE；VM 只做测试，职责最干净      |
+| 分支策略      | `main` / `develop` / `feature/*`  | 测试和生产天然隔离，是最标准的做法         |
+| 项目路径      | 三处统一 `/opt/candy-house-portfolio` | **消除路径差异**，nginx 配置两份环境通用 |
+| 生产环境（京东云） | **本阶段先不动**                        | 等测试环境跑顺了再做，见第 9 节         |
 
 ---
 
 ## 1. 三环境的职责（先记住这张表）
 
-| 环境 | 机器 | 路径 | 跟哪个分支 | .env 密码 | 谁能碰 |
-|---|---|---|---|---|---|
-| **开发机** | Windows（F 盘） | `F:\005_code\WORKbuddy\candy-house-portfolio` | `feature/*` | 不需要跑 | 你 |
-| **测试环境** | VM `ubuntu-dev` | `/opt/candy-house-portfolio` | `develop` | 简单即可 | 你 |
-| **生产环境** | 京东云服务器 | `/opt/candy-house-portfolio` | `main`（或 tag） | **强密码，唯一** | 你（谨慎） |
+| 环境       | 机器              | 路径                                            | 跟哪个分支         | .env 密码    | 谁能碰   |
+| -------- | --------------- | --------------------------------------------- | ------------- | ---------- | ----- |
+| **开发机**  | Windows（F 盘）    | `F:\005_code\WORKbuddy\candy-house-portfolio` | `feature/*`   | 不需要跑       | 你     |
+| **测试环境** | VM `ubuntu-dev` | `/opt/candy-house-portfolio`                  | `develop`     | 简单即可       | 你     |
+| **生产环境** | 京东云服务器          | `/opt/candy-house-portfolio`                  | `main`（或 tag） | **强密码，唯一** | 你（谨慎） |
 
 **铁律**：
+
 1. **密码永远不进 git**。每个环境有自己独立的 `api/.env`，都被 `.gitignore` 挡着。
 2. **生产只认 `main`**，测试只认 `develop`。生产绝不直接改代码。
 3. **GitHub 是唯一中转**。环境之间不互相拷文件，一律过 git。
@@ -75,7 +76,7 @@ develop       测试环境永远对应这个分支，"当前待验证的版本"
 main          生产环境对应这个分支，"已上线的稳定版本"
 ```
 
-**为什么多一层 `develop`？**
+**为什么多一层 `develop`？**  
 因为 `main` 直接对应线上。如果测试和 VM 都拉 `main`，那你 push 的瞬间生产就"该更新了"——哪怕你还没测。多一层 `develop`，等于给生产加了一道缓冲：**只有你主动合进 `main`，生产才会动。**
 
 ---
@@ -134,10 +135,10 @@ git clone -b develop git@github.com:ixuan1/candy-house-portfolio.git
 cd /opt/candy-house-portfolio
 ```
 
-> ⚠️ **为什么非要用 `/opt` 而不是 `/home/candyapp`？**
-> 因为 `nginx/nginx-host.conf` 第 28 行写死了 `root /opt/candy-house-portfolio/static;`。
-> 路径跟生产完全一致 → **这份 nginx 配置两份环境通用，一行都不用改**。
-> 如果放 `/home/candyapp`，你就得额外 `sed` 改路径，两份配置从此开始漂移，
+> ⚠️ **为什么非要用 `/opt` 而不是 `/home/candyapp`？**  
+> 因为 `nginx/nginx-host.conf` 第 28 行写死了 `root /opt/candy-house-portfolio/static;`。  
+> 路径跟生产完全一致 → **这份 nginx 配置两份环境通用，一行都不用改**。  
+> 如果放 `/home/candyapp`，你就得额外 `sed` 改路径，两份配置从此开始漂移，  
 > 迟早出现"测试好好的、线上 404"这种最难受的 bug。
 
 ---
@@ -168,8 +169,8 @@ grep -E 'MYSQL_PASSWORD|MYSQL_ROOT_PASSWORD|DATABASE_URL' api/.env
 # 目的：核对三处密码【完全一致】，这是最常见的启动失败原因
 ```
 
-> ⚠️ **密码只用字母+数字**（示例 `CandyDev2026`）。
-> 别用 `@`，它在 `DATABASE_URL` 里会被当成"密码和主机的分隔符"，
+> ⚠️ **密码只用字母+数字**（示例 `CandyDev2026`）。  
+> 别用 `@`，它在 `DATABASE_URL` 里会被当成"密码和主机的分隔符"，  
 > 导致主机解析成 `@db` → app 连不上库、无限重启。这个坑你踩过一次了。
 
 ---
@@ -253,8 +254,8 @@ sudo ufw allow 80/tcp
 
 浏览器打开 `http://<VM_IP>/` 和 `http://<VM_IP>/admin.html`。
 
-> **分层的意义**：如果第 1 层就挂了，问题在 app/db，跟 Nginx 无关；
-> 第 1 层通、第 2 层挂，问题在 Nginx 配置；两层都通、第 3 层挂，问题在防火墙或网络。
+> **分层的意义**：如果第 1 层就挂了，问题在 app/db，跟 Nginx 无关；  
+> 第 1 层通、第 2 层挂，问题在 Nginx 配置；两层都通、第 3 层挂，问题在防火墙或网络。  
 > 不分层的话，你只能瞎猜。
 
 ---
@@ -338,10 +339,10 @@ git push origin main --tags
 
 ## 6. 部署脚本（已写好，直接用）
 
-| 脚本 | 在哪跑 | 默认拉什么 | 回滚能力 |
-|---|---|---|---|
-| `deploy/deploy-dev.sh` | VM 测试环境 | `develop`（可传分支名覆盖） | 健康检查失败自动回滚到上一个提交 |
-| `deploy/deploy-prod.sh` | 京东云生产 | `main`（可传分支名或 tag） | 失败自动回滚 + **部署前自动备份数据库** |
+| 脚本                      | 在哪跑     | 默认拉什么              | 回滚能力                    |
+| ----------------------- | ------- | ------------------ | ----------------------- |
+| `deploy/deploy-dev.sh`  | VM 测试环境 | `develop`（可传分支名覆盖） | 健康检查失败自动回滚到上一个提交        |
+| `deploy/deploy-prod.sh` | 京东云生产   | `main`（可传分支名或 tag） | 失败自动回滚 + **部署前自动备份数据库** |
 
 ```bash
 # 用法示例
@@ -389,7 +390,7 @@ git checkout v1.0.0
 docker compose -f docker/docker-compose.yml up -d --build --scale app=2
 ```
 
-> ⚠️ 回滚只能回**代码**，回不了**数据库**。如果新版本改过表结构，回滚代码后数据结构可能对不上——
+> ⚠️ 回滚只能回**代码**，回不了**数据库**。如果新版本改过表结构，回滚代码后数据结构可能对不上——  
 > 所以生产部署前一定要先备份（脚本已自动做）。
 
 ---
@@ -404,6 +405,7 @@ docker compose -f docker/docker-compose.yml up -d --build --scale app=2
 4. 之后每次上线：Windows 上 `develop → main` 打 tag → 服务器上 `./deploy/deploy-prod.sh v1.0.0`。
 
 **生产额外红线**：
+
 - 部署前脚本会自动 `mysqldump` 备份，别跳过。
 - **永远不要在生产跑 `docker compose down -v`**（`-v` 删数据卷 = 删库）。
 - 生产不直接改代码，一切走 git。
@@ -414,11 +416,11 @@ docker compose -f docker/docker-compose.yml up -d --build --scale app=2
 
 MySQL 的 `init.sql` **只在数据卷为空时执行一次**。这意味着：
 
-| 场景 | 后果 | 怎么办 |
-|---|---|---|
-| 测试环境想重置数据 | 正常 | `docker compose down -v` 再 `up -d`（测试环境随便来） |
-| 生产改了表结构 | `git pull` **不会**自动执行新 SQL | 手动进容器执行，或写迁移脚本 |
-| 生产想重置 | ⚠️ **绝对不行** | 用备份恢复，别用 `down -v` |
+| 场景        | 后果                         | 怎么办                                         |
+| --------- | -------------------------- | ------------------------------------------- |
+| 测试环境想重置数据 | 正常                         | `docker compose down -v` 再 `up -d`（测试环境随便来） |
+| 生产改了表结构   | `git pull` **不会**自动执行新 SQL | 手动进容器执行，或写迁移脚本                              |
+| 生产想重置     | ⚠️ **绝对不行**                | 用备份恢复，别用 `down -v`                          |
 
 测试环境因为数据可丢，最简单：**改了 `init.sql` 就 `down -v` 重建**，省事。
 
@@ -426,21 +428,22 @@ MySQL 的 `init.sql` **只在数据卷为空时执行一次**。这意味着：
 
 ## 11. 环境差异对照（排错时先看这个）
 
-| 项目 | 测试环境 VM | 生产 京东云 |
-|---|---|---|
-| 路径 | `/opt/candy-house-portfolio` | `/opt/candy-house-portfolio`（**一致**） |
-| 分支 | `develop` | `main` / tag |
-| nginx 配置 | `nginx/nginx-host.conf`（**同一份，通用**） | 同一份 |
-| 容器数量 | 3（db + app×2） | 3（db + app×2） |
-| .env | 简单密码即可 | **强密码，独立一份** |
-| 数据 | 可丢 | **不可丢，先备份** |
-| 防火墙 | `ufw allow 80` | 京东云安全组 + 系统防火墙（**两道**） |
+| 项目       | 测试环境 VM                             | 生产 京东云                               |
+| -------- | ----------------------------------- | ------------------------------------ |
+| 路径       | `/opt/candy-house-portfolio`        | `/opt/candy-house-portfolio`（**一致**） |
+| 分支       | `develop`                           | `main` / tag                         |
+| nginx 配置 | `nginx/nginx-host.conf`（**同一份，通用**） | 同一份                                  |
+| 容器数量     | 3（db + app×2）                       | 3（db + app×2）                        |
+| .env     | 简单密码即可                              | **强密码，独立一份**                         |
+| 数据       | 可丢                                  | **不可丢，先备份**                          |
+| 防火墙      | `ufw allow 80`                      | 京东云安全组 + 系统防火墙（**两道**）               |
 
 ---
 
 ## 12. 当前阶段任务清单
 
 **阶段一（现在）**：
+
 - [ ] Windows 建 `develop` 分支并 push
 - [ ] VM 配 SSH 密钥，能 `ssh -T git@github.com`
 - [ ] VM clone 到 `/opt/candy-house-portfolio`（切 `develop`）
