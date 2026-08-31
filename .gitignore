@@ -28,6 +28,11 @@ Thumbs.db
 # ---------- Docker 本地产物（如有）----------
 docker/data/
 
+# ---------- 数据库备份（deploy-prod.sh 部署时自动生成）----------
+# 含真实生产数据，绝不入库。
+# ⚠️ 只忽略 backups/ 目录，不能图省事写 *.sql —— db/init.sql 是必须入库的建表脚本。
+backups/
+
 # ---------- 测试 / 缓存 ----------
 .pytest_cache/
 .mypy_cache/
