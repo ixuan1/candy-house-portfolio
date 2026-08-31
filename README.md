@@ -55,6 +55,9 @@ candy-house-portfolio/
 │   ├── STEP-BY-STEP.md      # 一步一步部署手册（含日志排查）
 │   ├── ops-guide.md         # 运维知识讲解
 │   ├── README.md            # 部署总览
+│   ├── WORKFLOW.md          # 【总纲】开发 → 测试 → 上线的完整流程
+│   ├── deploy-dev.sh        # 测试环境一键部署（健康检查失败自动回滚）
+│   ├── deploy-prod.sh       # 生产一键部署（自动备份 + 二次确认 + 失败回滚）
 │   ├── deploy.sh            # 本地一键部署脚本（上传 + 启动）
 │   ├── 404.html             # 自定义 404 页
 │   └── archive/             # 已弃用配置归档（勿用）
@@ -63,6 +66,31 @@ candy-house-portfolio/
 ├── LICENSE
 └── README.md
 ```
+
+## 开发到上线流程（推荐先看这个）
+
+三环境分工，**GitHub 是唯一中转站**，环境之间不互相拷文件：
+
+| 环境 | 机器 | 路径 | 跟哪个分支 |
+| --- | --- | --- | --- |
+| 开发机 | Windows（F 盘） | `F:\005_code\...\candy-house-portfolio` | `feature/*` |
+| 测试环境 | VM `ubuntu-dev` | `/opt/candy-house-portfolio` | `develop` |
+| 生产环境 | 京东云 | `/opt/candy-house-portfolio` | `main` / tag |
+
+代码流向（**单向，绝不反向合并**）：
+
+```
+feature/*  ──►  develop  ──►  main（每个可上线版本打 tag）
+    │              │              │
+  开发机         测试环境        生产环境
+```
+
+- 完整的分支策略、日常循环、回滚方法、数据库迁移注意：见 [`deploy/WORKFLOW.md`](deploy/WORKFLOW.md)
+- 一键部署脚本：`deploy/deploy-dev.sh`（测试）、`deploy/deploy-prod.sh`（生产，自动备份 + 失败回滚）
+
+> 路径在测试和生产都统一为 `/opt/candy-house-portfolio`，
+> 这样 `nginx/nginx-host.conf` 两份环境通用、一行都不用改，
+> 从根上避免"测试好好的、线上 404"的路径漂移问题。
 
 ## 快速开始（本地开发）
 
@@ -117,8 +145,5 @@ python -m http.server 5500 -d static       # 然后访问 http://localhost:5500/
 - 更多见 [`deploy/STEP-BY-STEP.md`](deploy/STEP-BY-STEP.md) 第 11 步。
 
 ## 许可证
-
-
-test
 
 [MIT](LICENSE) © 2026 Candy House
